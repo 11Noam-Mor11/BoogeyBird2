@@ -25,6 +25,7 @@ namespace BoogeyMan
         private Texture2D _rectangleTexture; // Added variable to hold the rectangle texture
         private Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle(20, 20, 160 * 5, 100 * 5);
 
+        private bool pipeInvincible = false;
         private int pipeSpeed = 5;
 
         public Game1()
@@ -63,11 +64,14 @@ namespace BoogeyMan
 
         protected override void Update(GameTime gameTime)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift)) pipeInvincible = true;
+            //else pipeInvincible = false;
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
+            { 
                 _birdVelocity = FlapStrength;
             }
 
@@ -90,18 +94,21 @@ namespace BoogeyMan
 
             _pipes.RemoveAll(p => p.position.X < -Pipe.PipeWidth); //remove pipes at end of screen
 
-            if (CheckLoseCondition(_pipes, _birdTexture, _birdPosition)) Exit(); // Game over
+            if (CheckLoseCondition(_pipes, _birdTexture, _birdPosition, pipeInvincible)) Exit(); // Game over
 
             base.Update(gameTime);
         }
 
-        public static bool CheckLoseCondition(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition)
+
+
+        public static bool CheckLoseCondition(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition, bool PI)
         {
-            return CheckPipeCol(pipes, birdTexture, birdPosition);
+            return CheckPipeCol(pipes, birdTexture, birdPosition, PI);
         }
 
-        public static bool CheckPipeCol(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition)
+        public static bool CheckPipeCol(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition, bool PI)
         {
+            if (PI) return false; //pipe invincibility
             foreach (var pipe in pipes)
             {
                 if (birdPosition.X + birdTexture.Width > pipe.position.X && birdPosition.X < pipe.position.X + Pipe.PipeWidth &&
