@@ -23,7 +23,7 @@ namespace BoogeyMan
         private const float PipeSpawnInterval = 1.5f; // in seconds
         private const int PipeGap = 150;
         private Texture2D _rectangleTexture; // Added variable to hold the rectangle texture
-        private Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle(20, 20, 160*5, 100*5);
+        private Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle(20, 20, 160 * 5, 100 * 5);
 
         private int pipeSpeed = 5;
 
@@ -32,7 +32,7 @@ namespace BoogeyMan
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-        } 
+        }
 
         protected override void Initialize()
         {
@@ -88,18 +88,29 @@ namespace BoogeyMan
                 pipe.Update();
             }
 
-            _pipes.RemoveAll(p => p.position.X < -Pipe.PipeWidth);
+            _pipes.RemoveAll(p => p.position.X < -Pipe.PipeWidth); //remove pipes at end of screen
 
-            foreach (var pipe in _pipes)
-            {
-                if (_birdPosition.X + _birdTexture.Width > pipe.position.X && _birdPosition.X < pipe.position.X + Pipe.PipeWidth &&
-                    _birdPosition.Y + _birdTexture.Height > pipe.position.Y && _birdPosition.Y < pipe.position.Y + Pipe.PipeHeight)
-                {
-                    Exit(); // Game over
-                }
-            }
+            if (CheckLoseCondition(_pipes, _birdTexture, _birdPosition)) Exit(); // Game over
 
             base.Update(gameTime);
+        }
+
+        public static bool CheckLoseCondition(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition)
+        {
+            return CheckPipeCol(pipes, birdTexture, birdPosition);
+        }
+
+        public static bool CheckPipeCol(List<Pipe> pipes, Texture2D birdTexture, Vector2 birdPosition)
+        {
+            foreach (var pipe in pipes)
+            {
+                if (birdPosition.X + birdTexture.Width > pipe.position.X && birdPosition.X < pipe.position.X + Pipe.PipeWidth &&
+                    birdPosition.Y + birdTexture.Height > pipe.position.Y && birdPosition.Y < pipe.position.Y + Pipe.PipeHeight)
+                {
+                    return true; //Pipe has collided with player
+                }
+            }
+            return false;
         }
 
         protected override void Draw(GameTime gameTime)
