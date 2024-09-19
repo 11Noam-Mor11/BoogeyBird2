@@ -22,14 +22,17 @@ namespace BoogeyMan
         private float _pipeSpawnTimer;
         private const float PipeSpawnInterval = 1.5f; // in seconds
         private const int PipeGap = 150;
+        private Texture2D _rectangleTexture; // Added variable to hold the rectangle texture
+        private Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle(20, 20, 160*5, 100*5);
 
         private int pipeSpeed = 5;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-        }
+        } 
 
         protected override void Initialize()
         {
@@ -41,10 +44,10 @@ namespace BoogeyMan
             int h = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.PreferredBackBufferWidth = w;
             _graphics.PreferredBackBufferHeight = h;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
-            base.Initialize(); 
+            base.Initialize();
         }
 
         protected override void LoadContent()
@@ -52,6 +55,10 @@ namespace BoogeyMan
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _birdTexture = Content.Load<Texture2D>("bird");
             _pipeTexture = Content.Load<Texture2D>("pipe");
+
+            // Create a 1x1 texture for the rectangle
+            _rectangleTexture = new Texture2D(GraphicsDevice, 1, 1);
+            _rectangleTexture.SetData(new[] { Microsoft.Xna.Framework.Color.White });
         }
 
         protected override void Update(GameTime gameTime)
@@ -77,7 +84,7 @@ namespace BoogeyMan
             }
 
             foreach (var pipe in _pipes)
-            { 
+            {
                 pipe.Update();
             }
 
@@ -97,14 +104,17 @@ namespace BoogeyMan
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(_birdTexture, _birdPosition, Color.White);
+            _spriteBatch.Draw(_birdTexture, _birdPosition, Microsoft.Xna.Framework.Color.White);
             foreach (var pipe in _pipes)
             {
                 pipe.Draw(_spriteBatch);
             }
+
+            // Draw the rectangle
+            _spriteBatch.Draw(_rectangleTexture, rectangle, Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             base.Draw(gameTime);
